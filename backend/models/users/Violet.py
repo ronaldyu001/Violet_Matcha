@@ -1,0 +1,15 @@
+Violet = {
+    "first_name": "Violet",
+    "last_name": "Yu",
+    "email": "violetyu02@gmail.com",
+    "phone": "2817993394",
+    "country": "United States",
+    "address": "4916 Holly Street",
+    "city": "Bellaire",
+    "state": "TX",
+    "zipcode": "77401",
+    "card_number": '12345',
+    "expiration_date": '12/34',
+    "security_code": '123',
+    "name_on_card": 'Violet Yu',
+}

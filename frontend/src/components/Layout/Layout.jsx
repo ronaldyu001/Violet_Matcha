@@ -7,7 +7,9 @@ export default function Layout(){
             style={{
                 backgroundColor: "#000", 
                 height: '100vh', 
-                width: '100vw'
+                width: '100vw',
+                padding: 0,
+                margin: 0
             }}>
             <Outlet/>
         </div>
