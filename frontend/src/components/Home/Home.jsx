@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import image0 from '../../assets/images/homepage_header/Matcha-Featured-Tea_600x600.webp'
+// import image0 from '../../assets/images/homepage_header/Matcha-Featured-Tea_600x600.webp'
+import image0 from '../../assets/images/homepage_header/matcha-tea-frame-background-in-flat-design-vector.jpg'
 import image1 from '../../assets/images/matchas/ChiginoShiroMatchaMarukyuKoyamaen1_3000x.webp';
 import image2 from '../../assets/images/matchas/EijuMatchaMarukyuKoyamaen1_3000x.webp';
 import image3 from '../../assets/images/matchas/IsuzuMatchaMarukyuKoyamaen1_3000x.webp';
@@ -27,12 +28,14 @@ export default function Home() {
   const [cart, setCart] = useState({});
   const [isLive, setIsLive] = useState(false);
 
+
   const addToCart = (productId) => {
     setCart((prevCart) => ({
       ...prevCart,
       [productId]: (prevCart[productId] || 0) + 1,
     }));
   };
+
 
   const cartItems = Object.entries(cart).map(([id, qty]) => {
     const product = products.find((p) => p.id === parseInt(id));
@@ -41,6 +44,7 @@ export default function Home() {
       quantity: qty,
     };
   });
+
 
   const removeFromCart = (productId) => {
     setCart((prevCart) => {
@@ -53,27 +57,76 @@ export default function Home() {
       return updatedCart;
     });
   };
-  
-  const handleOrder = () => {
-    console.log('Cart Contents:');
-    cartItems.forEach(item => {
-      console.log(`${item.name} — Quantity: ${item.quantity}`);
-    });
-  };
+
 
   const handleCancel = () => {
     console.log("Canceling service.")
+    setIsLive(false)
   }
+  
+
+  const handleOrder = async () => {
+    // get orders
+    console.log("Creating order list.");
+    const order_list = [];
+    cartItems.forEach(item => { order_list.push({ name: item.name, quantity: item.quantity })});
+    console.log(order_list);
+
+    // create payload
+    console.log("Creating order payload.");
+    const payload = {
+      orders: order_list,
+      active: true
+    };
+    console.log(payload);
+
+    // send payload
+    try {
+      const response = await fetch("http://localhost:8000/api/order_matcha", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+      console.log("Response from backend:", data);
+    } catch (error) {
+      console.error("Error sending order:", error);
+    } finally{
+      setIsLive(false)
+    }
+  };
   
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#FFF', margin: 0, padding: 0 }}>
 
       {/* Header Image */}
-      <div style={{ width: '100vw', height: '30vh' }}>
-        <img  src={image0}
-              alt="Homepage header"
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+      <div style={{ width: '100vw', height: '30vh', position: 'relative' }}>
+        <img
+          src={image0}
+          alt="Homepage header"
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+        <h1
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            fontSize: '4rem',
+            color: 'white',
+            textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+            margin: 0,
+            fontFamily: 'serif',
+            letterSpacing: '2px',
+            color: '#333'
+          }}
+        >
+          Matcha.
+        </h1>
       </div>
 
       {/* Main content: scrollable matchas + fixed cart */}

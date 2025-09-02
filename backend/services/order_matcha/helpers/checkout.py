@@ -7,9 +7,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
 
-from config import CART_URL
-from backend.models.users.Violet import Violet
+from services.order_matcha.config import CART_URL
+from models.Violet.Violet import Violet
 from wrappers._selenium._selenium import SeleniumWrapper
+from services.order_matcha.helpers.scroll_to_element import scroll_to_element
 
 
 # === helpers ===
@@ -34,17 +35,18 @@ def checkout(crawler: SeleniumWrapper):
         user = Violet
 
         # --- agree to TOS ---
-        logging.info("Agreeing to TOS.")
         tos_button = crawler.wait().until(
             EC.presence_of_element_located((By.XPATH, '//input[@id="cart_agree" and @type="checkbox"]'))
         )
+        logging.info("Agreeing to TOS.")
         tos_button.click()
 
         # --- press checkout ---
-        logging.info("Proceeding to checkout.")
         checkout_button = crawler.wait().until(
             EC.presence_of_element_located((By.XPATH, '//button[@type="submit" and @name="checkout" and contains(@class, "add_to_cart")]'))
         )
+        scroll_to_element(crawler=crawler, element=checkout_button)
+        logging.info("Proceeding to checkout.")
         checkout_button.click()
 
         # --- enter delivery information ---
@@ -105,7 +107,7 @@ def checkout(crawler: SeleniumWrapper):
         }
 
         # get rid of popup
-        try: WebDriverWait(driver=crawler.driver, timeout=3).until(EC.presence_of_element_located((By.XPATH, payment_fields_xpaths["card_number"])))
+        try: WebDriverWait(driver=crawler.driver, timeout=5).until(EC.presence_of_element_located((By.XPATH, payment_fields_xpaths["card_number"])))
         except: 
             logging.info("Clicking screen.")
             time.sleep(1)
@@ -133,12 +135,13 @@ def checkout(crawler: SeleniumWrapper):
         exp_date_iframe = crawler.wait().until(EC.presence_of_element_located((By.XPATH, exp_date_iframe_xpath)))
         for load in payload:
             infiltrate_iframe(crawler=crawler, xpath=exp_date_xpath, iframe=exp_date_iframe, payload=load, clear=False)
-            time.sleep(2)
+            time.sleep(1)
 
         # use same billing as shipping
         same_billing_checkbox = crawler.wait().until(
             EC.presence_of_element_located((By.XPATH, '//input[@type="checkbox" and @id="billingAddress"]'))
         )
+        crawler.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", same_billing_checkbox)
         same_billing_checkbox.click()
 
         # don't save info (assuming automatically on)
@@ -148,3 +151,4 @@ def checkout(crawler: SeleniumWrapper):
 
     except Exception as err:
         logging.error(err)
+        raise Exception(err)

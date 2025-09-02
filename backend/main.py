@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from routes.order_matcha import order_matcha
 
 
 # --- create FastAPI app ---
@@ -18,6 +19,6 @@ app.add_middleware(
 
 
 # ----- register routes -----
-
+app.include_router(router=order_matcha.router, prefix="/api")
 
 # ----- startup events -----

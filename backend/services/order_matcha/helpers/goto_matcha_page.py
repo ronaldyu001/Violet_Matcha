@@ -26,3 +26,4 @@ def goto_matcha_page(crawler: SeleniumWrapper):
 
     except Exception as err:
         logging.error(f"Failed to navigate to matcha page: {repr(err)}")
+        raise Exception(err)
